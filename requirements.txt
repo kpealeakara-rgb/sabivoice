@@ -1,0 +1,11 @@
+gradio==4.44.1
+huggingface_hub>=0.24
+transformers>=4.44
+torch
+librosa
+soundfile
+sentence-transformers>=3.0
+numpy
+pandas
+gTTS
+llama-cpp-python==0.3.2
