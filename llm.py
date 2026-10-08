@@ -7,7 +7,7 @@ BACKEND = os.getenv("LLM_BACKEND", "llamacpp")
 HF_MODEL = os.getenv("LLM_MODEL", "NCAIR1/N-ATLaS")
 GGUF_REPO = os.getenv("GGUF_REPO", "tosinamuda/N-ATLaS-GGUF")
 GGUF_FILE = os.getenv("GGUF_FILE", "*Q4_K_M.gguf")
-MAX_NEW = int(os.getenv("MAX_NEW_TOKENS", "320"))
+MAX_NEW = int(os.getenv("MAX_NEW_TOKENS", "220"))
 
 
 @functools.lru_cache(maxsize=1)

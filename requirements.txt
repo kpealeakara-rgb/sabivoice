@@ -2,6 +2,7 @@ gradio==4.44.1
 huggingface_hub>=0.24
 transformers>=4.44
 torch
+accelerate>=0.26
 librosa
 soundfile
 sentence-transformers>=3.0
