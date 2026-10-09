@@ -1,4 +1,7 @@
+from pathlib import Path
+import tempfile
 """SabiVoice: voice-first citizen helpline on N-ATLaS."""
+import os
 import time
 from collections import Counter
 
@@ -12,7 +15,7 @@ import store
 import tts
 from safety import redact, mentions_secret
 
-MIN_SCORE = 0.45  # below this, retrieval is not trusted
+MIN_SCORE = 0.55  # below this, retrieval is not trusted
 
 SYSTEM = (
     "You are SabiVoice, a public-service helpline assistant for Nigerians. "
@@ -37,11 +40,17 @@ def answer(question: str):
     hits = rag.search(question, k=4)
     good = [(s, c) for s, c in hits if s >= MIN_SCORE]
     if not good:
+        top_score = hits[0][0] if hits else 0.0
         top = hits[0][1] if hits else None
-        msg = ("I'm not fully sure about this one, so I don't want to guess. ")
-        if top and top.agency:
-            msg += f"The best people to ask are {top.agency}: {top.contact}"
-        return msg, [], (top.topic if top else "Unknown"), (hits[0][0] if hits else 0.0), False
+        if top and top_score >= 0.48:
+            msg = ("I'm not fully sure about this one, so I don't want to guess. "
+                   f"The best people to ask are {top.agency}: {top.contact}")
+            return msg, [], top.topic, top_score, False
+        msg = ("Sorry, I can only help with government and citizen services for now: "
+               "tax, NIN and BVN, pensions, health insurance, consumer complaints, "
+               "phone network problems, and checking if a message is a scam. "
+               "Please ask me about one of those.")
+        return msg, [], "Out of scope", top_score, False
 
     context = "\n\n".join(
         f"[{i}] ({c.topic} | {c.agency}) {c.title}\n{c.text}\nSource: {c.source}"
@@ -68,7 +77,7 @@ def handle(consent, audio, typed):
 
     reply, used, topic, score, grounded = answer(question)
     sources = "\n".join(
-        f"[{i}] [{c.title}]({c.source}) · {c.agency}" for i, (_, c) in enumerate(used, 1)
+        f"[{i}] [{c.title}]({c.source}) \u00b7 {c.agency}" for i, (_, c) in enumerate(used, 1)
     ) or "_No matching official source found._"
     audio_out = tts.speak(reply)
 
@@ -105,14 +114,14 @@ def dashboard():
     sat = f"{100 * rated.mean():.0f}%" if len(rated) else "n/a"
     gaps = int((~df["grounded"]).sum())
     summary = (
-        f"**{total}** interactions · **{voice}** by voice · satisfaction **{sat}** "
-        f"({len(rated)} rated) · **{gaps}** knowledge gaps · median latency "
+        f"**{total}** interactions \u00b7 **{voice}** by voice \u00b7 satisfaction **{sat}** "
+        f"({len(rated)} rated) \u00b7 **{gaps}** knowledge gaps \u00b7 median latency "
         f"**{df['latency_s'].median():.1f}s**"
     )
     by_topic = (pd.DataFrame(Counter(df["topic"]).most_common(), columns=["topic", "questions"]))
     gap_df = df[~df["grounded"]][["ts", "topic", "question"]].tail(25)
     recent = df[["ts", "channel", "topic", "question", "helpful"]].tail(25).iloc[::-1]
-    path = store.DATA_DIR / "interactions_export.csv"
+    path = Path(tempfile.gettempdir()) / "sabivoice_interactions_export.csv"
     df.to_csv(path, index=False)
     return summary, by_topic, gap_df, recent, str(path)
 
@@ -121,7 +130,7 @@ THEME = gr.themes.Soft(primary_hue="green", secondary_hue="emerald", neutral_hue
 
 with gr.Blocks(theme=THEME, title="SabiVoice") as demo:
     gr.Markdown(
-        "# 🎙️ SabiVoice\n"
+        "# \U0001f399\ufe0f SabiVoice\n"
         "**Ask about tax, NIN, BVN, health insurance, pensions, your rights as a customer, "
         "or a message you think is a scam. Speak in your normal Nigerian English.**"
     )
@@ -135,7 +144,7 @@ with gr.Blocks(theme=THEME, title="SabiVoice") as demo:
             with gr.Column():
                 audio = gr.Audio(sources=["microphone", "upload"], type="filepath",
                                  label="Record your question")
-                typed = gr.Textbox(label="…or type it", lines=2,
+                typed = gr.Textbox(label="\u2026or type it", lines=2,
                                    placeholder="e.g. Do I still pay tax if I earn 70k a month?")
                 ask = gr.Button("Ask SabiVoice", variant="primary")
                 gr.Examples(
@@ -155,8 +164,8 @@ with gr.Blocks(theme=THEME, title="SabiVoice") as demo:
                     gr.Markdown("**Was this helpful?**")
                     comment = gr.Textbox(label="Anything we should fix? (optional)")
                     with gr.Row():
-                        yes = gr.Button("👍 Yes")
-                        no = gr.Button("👎 No")
+                        yes = gr.Button("\U0001f44d Yes")
+                        no = gr.Button("\U0001f44e No")
                 thanks = gr.Markdown()
         ask.click(handle, [consent, audio, typed], [heard, reply, srcs, spoken, iid, fb_box])
         yes.click(lambda i, c: feedback(i, True, c), [iid, comment], [thanks, fb_box])
@@ -179,4 +188,4 @@ with gr.Blocks(theme=THEME, title="SabiVoice") as demo:
         gr.Markdown(open("README.md", encoding="utf-8").read().split("---", 2)[-1])
 
 if __name__ == "__main__":
-    demo.queue(max_size=32).launch()
+    demo.queue(max_size=32).launch(share=os.getenv("SHARE") == "1")
