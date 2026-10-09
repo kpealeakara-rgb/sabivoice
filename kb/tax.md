@@ -4,34 +4,34 @@ agency: your State Internal Revenue Service (or the Nigeria Revenue Service if y
 contact: https://www.nrs.gov.ng
 ---
 
-## The new tax law started on 1 January 2026
-The Nigeria Tax Act 2025 was signed on 26 June 2025 and took effect on 1 January 2026. It replaced several older tax laws, including the Personal Income Tax Act. Tax for periods before 1 January 2026 is still handled under the old laws.
-Source: https://www.adeolaoyinlade.com/en/understanding-personal-income-tax-under-the-nigerian-tax-act-2025/
+## The new tax law: Nigeria Tax Act 2025
+The Nigeria Tax Act 2025 (Act No. 7 of 2025) was published in the Official Gazette on 26 June 2025 and applies from 1 January 2026. It repealed and replaced older tax laws, including the Personal Income Tax Act, the Companies Income Tax Act and the Capital Gains Tax Act, and brought them into one law. The Federal Inland Revenue Service (FIRS) is now called the Nigeria Revenue Service (NRS).
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
 ## Who pays no income tax
-Under the Nigeria Tax Act 2025, the first ₦800,000 of a person's yearly taxable income is taxed at 0%. That is about ₦66,667 per month. The old tax-free level was ₦300,000. People earning the national minimum wage are exempt from personal income tax.
-Source: https://www.adeolaoyinlade.com/en/understanding-personal-income-tax-under-the-nigerian-tax-act-2025/
+Under the Nigeria Tax Act 2025 (Fourth Schedule), the first ₦800,000 of a person's yearly taxable income is taxed at 0%. That is about ₦66,667 per month. Section 58 also says people earning the national minimum wage do not pay personal income tax.
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
 ## The new personal income tax bands
-Tax is charged in steps on yearly taxable income: the first ₦800,000 at 0%; the next ₦2,200,000 (up to ₦3 million) at 15%; the next ₦9 million (up to ₦12 million) at 18%; the next ₦13 million (up to ₦25 million) at 21%; the next ₦25 million (up to ₦50 million) at 23%; and anything above ₦50 million at 25%. You only pay the higher rate on the part of income inside that band, not on all your income.
-Source: https://www.adeolaoyinlade.com/en/understanding-personal-income-tax-under-the-nigerian-tax-act-2025/
+Under the Fourth Schedule of the Nigeria Tax Act 2025, yearly taxable income is taxed in steps: the first ₦800,000 at 0%; the next ₦2,200,000 at 15%; the next ₦9,000,000 at 18%; the next ₦13,000,000 at 21%; the next ₦25,000,000 at 23%; and anything above ₦50,000,000 at 25%. You only pay a higher rate on the part of your income inside that band, not on all of your income.
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
 ## Worked example: earning ₦1,200,000 a year
-If your taxable income is ₦1,200,000 in a year, the first ₦800,000 is tax-free and the remaining ₦400,000 is taxed at 15%. Your total tax is ₦60,000 for the year, which is ₦5,000 a month.
-Source: https://www.adeolaoyinlade.com/en/understanding-personal-income-tax-under-the-nigerian-tax-act-2025/
+Using the bands in the Nigeria Tax Act 2025: if your taxable income is ₦1,200,000 in a year, the first ₦800,000 is taxed at 0% and the remaining ₦400,000 at 15%. Your total tax is ₦60,000 for the year, which is ₦5,000 a month.
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
-## Rent relief replaced the old consolidated relief allowance
-The old Consolidated Relief Allowance (CRA) was removed. Instead, people who pay rent can deduct 20% of the rent they paid in the year, up to a maximum of ₦500,000, before their tax is worked out. You need proof of the rent you actually paid.
-Source: https://legalbytes.substack.com/p/understanding-nigerias-2026-tax-reform-646
+## Rent relief
+Under section 30 of the Nigeria Tax Act 2025, a person who pays rent can deduct 20% of the rent they paid in the year, up to a maximum of ₦500,000, before their tax is worked out. You must declare the actual rent you paid to your tax authority.
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
-## VAT is still 7.5%
-The VAT rate remains 7.5% in 2026; the new tax law did not change it. Basic food items, medicines, educational materials and residential rent are exempt or zero-rated.
-Source: https://owoode.com/guides/nigeria-tax-rates-2026
+## VAT is 7.5%, and some things are 0%
+Section 148 of the Nigeria Tax Act 2025 sets VAT at 7.5%. Section 187 charges 0% VAT on basic food items, medical and pharmaceutical products, educational books and materials, fertilisers, and some other essentials.
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
 ## Small companies pay 0% company income tax
-Under the Nigeria Tax Act 2025, small companies with yearly turnover of ₦50 million or less pay 0% company income tax. Other companies pay 30%, plus a 4% development levy on assessable profits.
-Source: https://owoode.com/guides/nigeria-tax-rates-2026
+Under section 56 of the Nigeria Tax Act 2025, a small company pays 0% company income tax and other companies pay 30%. A small company is one with yearly turnover of ₦50 million or less and fixed assets of no more than ₦250 million; businesses that provide professional services do not count as small companies. Companies that are not small also pay a 4% development levy on assessable profits (section 59).
+Source: https://tat.gov.ng/Nigeria-Tax-Act-2025.pdf
 
 ## Who collects your income tax
-Most salaried workers pay personal income tax (PAYE) to the Internal Revenue Service of the state where they live, through their employer. Residents of the FCT, members of the armed forces and police, and some others pay to the federal tax authority. If you are self-employed, you file your own yearly return with your state Internal Revenue Service.
-Source: https://www.countrytaxcalc.com/tax-guides/nigeria-income-tax-guide-2026/
+Most salaried workers pay personal income tax (PAYE) through their employer to the Internal Revenue Service of the state where they live. Residents of the FCT pay to the Nigeria Revenue Service. If you are self-employed, you file your own yearly return with your state Internal Revenue Service.
+Source: https://www.nrs.gov.ng
