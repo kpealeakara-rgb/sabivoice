@@ -2,6 +2,7 @@
 so the first real tester does not wait for model downloads and GPU warm-up.
 Nothing here is logged as an interaction."""
 import time
+import traceback
 
 import numpy as np
 
@@ -15,12 +16,11 @@ def run():
 
     print("Warming up speech recognition...", flush=True)
     try:
-        asr._pipe()(
-            {"raw": np.zeros(16000, dtype=np.float32), "sampling_rate": 16000},
-            generate_kwargs={"language": "english", "task": "transcribe"},
-        )
-    except Exception as e:
-        print("ASR warm-up skipped:", e, flush=True)
+        asr._run(np.zeros(16000, dtype=np.float32))
+        print("Voice OK.", flush=True)
+    except Exception:
+        print("VOICE PROBLEM at startup (screenshot this):", flush=True)
+        traceback.print_exc()
 
     print("Warming up N-ATLaS (first start downloads the model, about 5 to 10 minutes)...", flush=True)
     llm.chat([
