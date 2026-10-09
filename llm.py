@@ -1,5 +1,6 @@
 """N-ATLaS answer generation. CPU (GGUF via llama.cpp) or GPU (transformers)."""
 import os
+import re
 import datetime
 import functools
 
@@ -8,6 +9,14 @@ HF_MODEL = os.getenv("LLM_MODEL", "NCAIR1/N-ATLaS")
 GGUF_REPO = os.getenv("GGUF_REPO", "tosinamuda/N-ATLaS-GGUF")
 GGUF_FILE = os.getenv("GGUF_FILE", "*Q4_K_M.gguf")
 MAX_NEW = int(os.getenv("MAX_NEW_TOKENS", "220"))
+
+# Drop meta lines like "Answer based on passage [1]." that the model sometimes adds.
+_META = re.compile(r"(?im)^\s*\(?\s*(this )?(answer|response|information)?\s*(is )?based on (the )?(official )?passages?[^\n]*$")
+
+
+def _clean(text: str) -> str:
+    text = _META.sub("", text)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
 @functools.lru_cache(maxsize=1)
@@ -60,11 +69,11 @@ def chat(messages: list[dict]) -> str:
                 **inputs, max_new_tokens=MAX_NEW, do_sample=True, temperature=0.2,
                 top_p=0.9, repetition_penalty=1.1,
             )
-        return tok.decode(out[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True).strip()
+        return _clean(tok.decode(out[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True))
 
     llm = _llamacpp()
     res = llm.create_chat_completion(
         messages=messages, max_tokens=MAX_NEW, temperature=0.2, top_p=0.9,
         repeat_penalty=1.1,
     )
-    return res["choices"][0]["message"]["content"].strip()
+    return _clean(res["choices"][0]["message"]["content"])
