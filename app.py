@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import tempfile
 """SabiVoice: voice-first citizen helpline on N-ATLaS."""
 import os
@@ -15,7 +16,10 @@ import store
 import tts
 from safety import redact, mentions_secret
 
-MIN_SCORE = 0.55  # below this, retrieval is not trusted
+# Retrieval thresholds, tuned on real tester questions (Oct 9): in-scope questions
+# scored 0.66-0.83, off-topic ones (criminal law, national anthem) 0.56-0.61.
+MIN_SCORE = 0.64      # below this, retrieval is not trusted for an answer
+POINTER_SCORE = 0.62  # between this and MIN_SCORE, point to the agency instead
 
 SYSTEM = (
     "You are SabiVoice, a public-service helpline assistant for Nigerians. "
@@ -24,6 +28,8 @@ SYSTEM = (
     "3 to 6 short sentences, no jargon, no markdown headings. "
     "Cite the passages you used like [1] or [2], but never use the word 'passage' in your answer. "
     "Do not state anything stronger or more general than the passages say. "
+    "Only give phone numbers, USSD codes, websites, emails or addresses that appear word for word "
+    "in the passages. Never make one up. "
     "End with one concrete next step (where to go, which code to dial, which office or website). "
     "If the passages do not answer the question, say you are not sure and point to the agency listed. "
     "Never ask for or accept a PIN, OTP, password, CVV or full BVN/NIN. "
@@ -36,6 +42,36 @@ SECRET_WARNING = (
     "No genuine agency will ask for these by call, SMS or WhatsApp. "
 )
 
+OUT_OF_SCOPE = (
+    "Sorry, I can only help with government and citizen services for now: "
+    "tax, NIN and BVN, pensions, health insurance, consumer complaints, "
+    "phone network problems, and checking if a message is a scam. "
+    "Please ask me about one of those."
+)
+
+_PHONE = re.compile(r"\+?\d[\d\s\-()]{6,}\d")
+_URL = re.compile(r"(?:https?://)?(?:www\.)?[a-z0-9\-]+(?:\.[a-z0-9\-]+)*\.(?:gov\.ng|com\.ng|org\.ng|ng|com|org|net)(?:/\S*)?", re.I)
+
+
+def _digits(s: str) -> str:
+    return re.sub(r"\D", "", s)
+
+
+def _drop_invented_contacts(reply: str, context: str) -> str:
+    """Remove sentences that carry a phone number or website not found in the sources."""
+    ctx_digits = _digits(context)
+    ctx_low = context.lower()
+    kept = []
+    for sent in re.split(r"(?<=[.!?])\s+|\n+", reply):
+        bad = any(_digits(p) and _digits(p) not in ctx_digits for p in _PHONE.findall(sent))
+        for u in _URL.findall(sent):
+            host = re.sub(r"^(?:https?://)?(?:www\.)?", "", u.lower()).split("/")[0]
+            if host and host not in ctx_low:
+                bad = True
+        if not bad and sent.strip():
+            kept.append(sent.strip())
+    return " ".join(kept).strip()
+
 
 def answer(question: str):
     hits = rag.search(question, k=4)
@@ -43,25 +79,25 @@ def answer(question: str):
     if not good:
         top_score = hits[0][0] if hits else 0.0
         top = hits[0][1] if hits else None
-        if top and top_score >= 0.48:
+        if top and top_score >= POINTER_SCORE:
             msg = ("I'm not fully sure about this one, so I don't want to guess. "
                    f"The best people to ask are {top.agency}: {top.contact}")
             return msg, [], top.topic, top_score, False
-        msg = ("Sorry, I can only help with government and citizen services for now: "
-               "tax, NIN and BVN, pensions, health insurance, consumer complaints, "
-               "phone network problems, and checking if a message is a scam. "
-               "Please ask me about one of those.")
-        return msg, [], "Out of scope", top_score, False
+        return OUT_OF_SCOPE, [], "Out of scope", top_score, False
 
     context = "\n\n".join(
-        f"[{i}] ({c.topic} | {c.agency}) {c.title}\n{c.text}\nSource: {c.source}"
+        f"[{i}] ({c.topic} | {c.agency}) {c.title}\n{c.text}\nSource: {c.source}\nContact: {c.contact}"
         for i, (_, c) in enumerate(good, 1)
     )
     msgs = [
         {"role": "system", "content": SYSTEM},
         {"role": "user", "content": f"Official passages:\n{context}\n\nCitizen's question: {question}"},
     ]
-    reply = llm.chat(msgs)
+    reply = _drop_invented_contacts(llm.chat(msgs), context)
+    if not reply:
+        top = good[0][1]
+        reply = ("I'm not fully sure about this one, so I don't want to guess. "
+                 f"The best people to ask are {top.agency}: {top.contact}")
     if mentions_secret(question) and "PIN" not in reply:
         reply = SECRET_WARNING + reply
     return reply, good, good[0][1].topic, good[0][0], True
@@ -189,4 +225,4 @@ with gr.Blocks(theme=THEME, title="SabiVoice") as demo:
         gr.Markdown(open("README.md", encoding="utf-8").read().split("---", 2)[-1])
 
 if __name__ == "__main__":
-    demo.queue(max_size=32).launch(share=os.getenv("SHARE") == "1")
+    demo.queue(max_size=32).launch(share=os.getenv("SHARE") == "1", show_error=True)
